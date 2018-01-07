@@ -100,7 +100,7 @@ void setup() {
      pinMode(led_pin, OUTPUT);
      vw_set_rx_pin(recieve_pin);
      vw_set_ptt_inverted(true);
-     vw_setup(2000);
+     vw_setup(1600);
      Serial.println("Starting up the listening vw_rx_start().");
      vw_rx_start();
 
@@ -122,17 +122,16 @@ void setup() {
     delay(1000);
     Serial.println("System boot finished.");
     Serial.println("------------------ --- ---------------------");
-    
+
 }
 
 
 void loop() {
-  
  //    Serial.println("Waiting for new command...");
 
      uint8_t buf[VW_MAX_MESSAGE_LEN];
      uint8_t buflen = VW_MAX_MESSAGE_LEN;
-
+      
     
      if (vw_get_message(buf, &buflen)) {
       digitalWrite(led_pin, HIGH);
@@ -146,20 +145,24 @@ void loop() {
         Serial.print(", ");
       } 
       Serial.println("");
+
       if (inArray[0] > 510){
          Serial.println("FRONT DIRECTION ------------->");
          digitalWrite(led_pin, HIGH);
          mval = map(inArray[0], 511, 1023, 0, 255);
-         motor1.drive(mval);
-         delay(1000);      
-      } else if (inArray[0] < 495){
+         motor1.drive(mval, 300);  
+         
+         inArray[0] = 500;   
+      }else if (inArray[0] < 495){
          Serial.println("<------------ BACK DIRECTION");
          digitalWrite(led_pin, HIGH);
          mval1 = map(inArray[0], 494, 0, 0, -255);
-         motor1.drive(mval1);
-         delay(1000);
-      } 
-      
+         motor1.drive(mval1, 300);
+         inArray[0] = 500; 
+      } else {
+        motor1.standby();
+        inArray[0] = 500; 
+      }
 
       if (inArray[1] > 530){
           Serial.println("RIGHT TURN >>>>>>>>>>>>");
@@ -171,11 +174,12 @@ void loop() {
          servo.write(map(inArray[1], 494, 0, 1500, 1300));  
          delay(300);   
       } 
+      
 
-   } else {
-    motor1.brake(); 
-   }
-   
+    } else {
+      motor1.standby();
+    }
+       
 }
 
 

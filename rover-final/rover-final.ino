@@ -36,8 +36,12 @@ const int recieve_pin = 12;
 const int led_pin = 3;
 
 
+// Head and Back lights
+const int backLights = 8;
+int turnLights = 0;
+
 void setup() {
-     Serial.begin(9600);
+ //    Serial.begin(9600);
      Serial.println("******** SKL Electronics *******");
      delay(3000);
      Serial.println("System started. Tests will start in 1 sec.");
@@ -118,6 +122,9 @@ void setup() {
      */
   // Reciever 433MHz settings ends Here *****
 
+  pinMode(backLights, OUTPUT);
+  digitalWrite(backLights, LOW);
+
     Serial.println("End of diagnostics.");
     delay(1000);
     Serial.println("System boot finished.");
@@ -134,16 +141,31 @@ void loop() {
       
     
      if (vw_get_message(buf, &buflen)) {
+      
       digitalWrite(led_pin, HIGH);
       for (int i = 0; i < buflen; i++){
         inDataSeq.s[i] = buf[i];
       }
-      digitalWrite(led_pin, LOW);
-      DecodeRFData(inArray, inDataSeq);
+      
+      DecodeRFData(inArray, inDataSeq); 
       for (int i = 0; i < RF_DATA_ARRAY_SIZE; i++){
         Serial.print((int)inArray[i]);
         Serial.print(", ");
       } 
+      if (inArray[2] < 1){
+       Serial.println("Change Lights State!");
+        if (turnLights > 0){
+          Serial.println("We turn  BACK light OFF");
+          turnLights = 0;
+        digitalWrite(backLights, LOW);    
+      
+        }  else if (turnLights == 0){
+           Serial.println("We turn  BACK light ON");
+          turnLights = 1;
+        digitalWrite(backLights, HIGH);
+       
+        }
+      }
       Serial.println("");
 
       if (inArray[0] > 510){
@@ -165,7 +187,8 @@ void loop() {
       }
 
       if (inArray[1] > 530){
-          Serial.println("RIGHT TURN >>>>>>>>>>>>");
+         Serial.println("RIGHT TURN >>>>>>>>>>>>");
+         digitalWrite(led_pin, HIGH);
          servo.write(map(inArray[1], 531, 1023, 1500, 2500));
          delay(300);
       } else if (inArray[1] < 495){
@@ -178,6 +201,7 @@ void loop() {
 
     } else {
       motor1.standby();
+      digitalWrite(led_pin, LOW);
     }
        
 }

@@ -9,6 +9,8 @@ Simple code for using Servo, Motor, Arduino and 433MHz transmitter
 </ol>
 
 <h2> Rover Diagram </h2>
-[img]https://i.imgur.com/AqX9mny.png[/img]
+
+![Rover Diagram](https://i.imgur.com/AqX9mny.png)
 <h2> Joystick Diagram </h2>
-[img]https://i.imgur.com/RGIYoDD.png[/img]
+
+![Rover Diagram](https://i.imgur.com/RGIYoDD.png)
